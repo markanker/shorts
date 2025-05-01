@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,13 +23,30 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-qa5w)c^xj%9tzbw!p+2*v!&7*)4b1ceps+ib(^j=)7&(l1e&n-'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(int(os.getenv('DEBUG')))
 
-ALLOWED_HOSTS = []
+if DEBUG:
+    CONSOLE_LOG_LEVEL = "DEBUG"
+    FILE_LOG_LEVEL = CONSOLE_LOG_LEVEL
+else:
+    CONSOLE_LOG_LEVEL = "WARNING"
+    FILE_LOG_LEVEL = "INFO"
 
+ALLOWED_HOSTS = ['127.0.0.1']
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_PORT = os.getenv('EMAIL_PORT')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL')
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+SERVER_EMAIL = EMAIL_HOST_USER
+EMAIL_ADMIN = EMAIL_HOST_USER
 
 # Application definition
 
@@ -78,8 +98,12 @@ WSGI_APPLICATION = 'shorts.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': os.getenv('DB_ENGINE'),
+        'NAME': os.getenv('DB_NAME', BASE_DIR / 'db.sqlite3'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
     }
 }
 
@@ -101,6 +125,8 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+AUTH_USER_MODEL = 'users.User'
 
 
 # Internationalization
@@ -124,3 +150,52 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'default': {
+            'format': '[%(asctime)s] %(levelname)s — in module %(module)s at line %(lineno)s: %(message)s'
+        }
+    },
+    'handlers': {
+        'standard_out': {
+            'level': CONSOLE_LOG_LEVEL,
+            'formatter': 'default',
+            'class': 'logging.StreamHandler',
+        },
+        'links_handler': {
+            'level': FILE_LOG_LEVEL,
+            'formatter': 'default',
+            'class': 'logging.FileHandler',
+            'filename': 'logs/links.log',
+        },
+        'users_handler': {
+            'level': FILE_LOG_LEVEL,
+            'formatter': 'default',
+            'class': 'logging.FileHandler',
+            'filename': 'logs/users.log',
+        },
+        'analytics_handler': {
+            'level': FILE_LOG_LEVEL,
+            'formatter': 'default',
+            'class': 'logging.FileHandler',
+            'filename': 'logs/analytics.log',
+        },
+    },
+    'loggers': {
+        'links': {
+            'handlers': ['standard_out', 'links_handler'],
+            'propagate': False,
+        },
+        'users': {
+            'handlers': ['standard_out', 'users_handler'],
+            'propagate': False,
+        },
+        'analytics': {
+            'handlers': ['standard_out', 'analytics_handler'],
+            'propagate': False,
+        },
+    },
+}
