@@ -1,7 +1,6 @@
 # IDE
 .idea/
 *.env
-*.xml
 
 # OS
 Thumbs.db
