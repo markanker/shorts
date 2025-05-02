@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from links.models import Link
 from users.models import User
-from .serializers import UserSerializer
+from .serializers import UserSerializer, RegistrationSerializer
 
 import logging
 logger = logging.getLogger('users')
@@ -51,7 +51,7 @@ class LogoutView(views.APIView):
 
 
 class RegistrationView(views.APIView):
-    serializer_class = UserSerializer
+    serializer_class = RegistrationSerializer
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)

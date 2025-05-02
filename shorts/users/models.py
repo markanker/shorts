@@ -14,9 +14,6 @@ class User(AbstractUser):
     def save(self, *args, **kwargs):
         if self.pk:
             old_obj = User.objects.get(pk=self.pk)
-            if self.pfp and old_obj.image != self.pfp:
+            if self.pfp and old_obj.pfp != self.pfp:
                 old_obj.pfp.delete(save=False)
-        if self.pfp:
-            logger.debug(f'pfp type: {type(self.pfp)}')
-            # process the pfp
         return super().save(*args, **kwargs)
