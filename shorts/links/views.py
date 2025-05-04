@@ -26,7 +26,7 @@ class LinksGetSourceView(GenericAPIView):
 class LinksListAddView(ListCreateAPIView):
     serializer_class = serializers.LinkSerializer
     """
-    YO GOTTA NOT TO BE ABLE TO SET USER OR SESSION BY YOURSELF BUT THE CONTROLLER HAS
+    YO GOT NOT TO BE ABLE TO SET USER OR SESSION BY YOURSELF BUT THE CONTROLLER HAS
     """
 
     def get_queryset(self):
