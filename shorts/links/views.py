@@ -1,8 +1,11 @@
 from django.shortcuts import redirect
-from rest_framework.generics import GenericAPIView, get_object_or_404
+from rest_framework.generics import GenericAPIView, ListCreateAPIView
+from rest_framework.mixins import DestroyModelMixin
+from rest_framework import status
+from rest_framework.response import Response
+
 from . import serializers
 from .models import Link
-from rest_framework.response import Response
 
 import logging
 logger = logging.getLogger('links')
@@ -20,29 +23,40 @@ class LinksGetSourceView(GenericAPIView):
         return redirect(instance.source_link)
 
 
-class LinksListAddView(GenericAPIView):
+class LinksListAddView(ListCreateAPIView):
     serializer_class = serializers.LinkSerializer
+    """
+    YO GOTTA NOT TO BE ABLE TO SET USER OR SESSION BY YOURSELF BUT THE CONTROLLER HAS
+    """
 
     def get_queryset(self):
-        return Link.objects.all()
-
-    def get(self, request):
-        # return all the user's links
-        pass
-
-    def post(self, request):
-        # return JSON
-        pass
+        return Link.objects.filter(user=self.request.user)
 
 
-class LinksDeleteUpdate(GenericAPIView):
+class LinksDeleteUpdate(DestroyModelMixin, GenericAPIView):
     serializer_class = serializers.LinkSerializer
     lookup_field = 'short_link'
 
-    def patch(self, request, short_link):
-        # return JSON
-        pass
+    def get_queryset(self):
+        return Link.objects.filter(user=self.request.user)
 
-    def delete(self, request, short_link):
-        # return JSON
-        pass
+    def patch(self, request):
+        instance = self.get_object()
+
+        if len(request.data) != 1 or "short_link" not in request.data:
+            return Response(
+                {'message': 'it is only possible to change short_link field and not other'},
+                status=status.HTTP_406_NOT_ACCEPTABLE
+            )
+
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+        return Response(serializer.data)
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
