@@ -1,9 +1,10 @@
-from django.shortcuts import redirect
 from rest_framework.generics import GenericAPIView, ListCreateAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.mixins import DestroyModelMixin
-from rest_framework import status
 from rest_framework.response import Response
+from rest_framework import status
 
+from django.shortcuts import redirect
 from . import serializers
 from .models import Link
 
@@ -13,6 +14,7 @@ logger = logging.getLogger('links')
 
 class LinksGetSourceView(GenericAPIView):
     lookup_field = 'short_link'
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         return Link.objects.all()

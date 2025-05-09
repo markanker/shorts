@@ -13,5 +13,5 @@ class LinkStats(models.Model):
     follower = models.ForeignKey(to=Follower, on_delete=models.CASCADE, related_name='stats', null=True, blank=True)
     is_owner = models.BooleanField(default=False)
     created_at = models.TimeField(auto_now_add=True)
-    is_mobile = models.BooleanField(default=False)
-    browser_name = models.BooleanField(default=False)
+    device = models.TextField(max_length=6, default='pc')
+    browser_name = models.TextField(max_length=30)
