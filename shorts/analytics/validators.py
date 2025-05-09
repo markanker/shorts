@@ -82,15 +82,7 @@ class FilterValidator:
                 raise ValidationError(f"Followers parameter must be either 'all' "
                                       f"or a positive integer number")
 
-    def __init__(self, owner=None, device='pc', time=None, from_time=None, to_time=None,
-                 followers='all', browser=None, country=None, city=None):
-        self.__validate_and_set_owner(owner)
-        self.__validate_and_set_device(device)
-        self.__validate_and_set_time(time, from_time, to_time)
-        self.__validate_and_set_followers(followers)
-        self.__validate_and_set_names(country=country, city=city, browser=browser)
-
-    def get_db_filter_kwargs(self):
+    def __get_db_filter_kwargs(self):
         return {
             'is_owner': self.__owner,
             'device': self.__device,
@@ -101,3 +93,13 @@ class FilterValidator:
             'follower__city': self.__city,
             'browser_name': self.__browser,
         }
+
+    def __init__(self, owner=None, device='pc', time=None, from_time=None, to_time=None,
+                 followers='all', browser=None, country=None, city=None):
+        self.__validate_and_set_owner(owner)
+        self.__validate_and_set_device(device)
+        self.__validate_and_set_time(time, from_time, to_time)
+        self.__validate_and_set_followers(followers)
+        self.__validate_and_set_names(country=country, city=city, browser=browser)
+
+        self.filter_kwargs = self.__get_db_filter_kwargs()
