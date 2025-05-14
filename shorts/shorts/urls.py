@@ -22,9 +22,9 @@ from django.urls import include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('users.urls')),
-    path('', include('analytics.urls')),
-    # path('', include('links.urls')),  here is a trap: converter which matches everything
+    path('api/', include('users.urls')),
+    path('api/', include('analytics.urls')),
+    path('', include('links.urls')),
 ]
 
 if settings.DEBUG:

@@ -9,7 +9,7 @@ register_converter(ShortLinkConverter, 'shorts')
 router = DefaultRouter()
 
 urlpatterns = [
-    path('links/', views.LinksListAddView.as_view()),  # /links/ [POST, GET]
-    path('links/<shorts:short_link>/', views.LinksDeleteUpdate.as_view()),  # /links/{id} [PATCH, DELETE]
+    path('api/links/', views.LinksListAddView.as_view()),  # /links/ [POST, GET]
+    path('api/links/<shorts:short_link>/', views.LinksDeleteUpdate.as_view()),  # /links/{short_link} [PATCH, DELETE]
     path('<shorts:short_link>/', views.LinksGetSourceView.as_view()),  # /{regular_expression}/ [GET]
 ]
