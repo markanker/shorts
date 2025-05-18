@@ -64,7 +64,7 @@ class LinksListAddView(ListCreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def get_queryset(self):
-        return Link.objects.filter(user=self.request.user)
+        return Link.objects.filter(user=self.request.user.id)
 
 
 class LinksDeleteUpdate(DestroyModelMixin, GenericAPIView):
