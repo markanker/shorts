@@ -35,6 +35,8 @@ def send_code(email_verif_obj: EmailVerificationModel, request):
         recipient_list=[address],
         fail_silently=True,
     )
+    email_verif_obj.sent_mail_to_user_counter += 1
+    email_verif_obj.save()
 
 
 def verify_email(user, request):
@@ -54,5 +56,8 @@ def send_again(request):
         )
     except EmailVerificationModel.DoesNotExist:
         raise EmailVerificationError("You cannot send code again")
+
+    email_verif_obj.code = get_random_unique_code()
+    email_verif_obj.save()
 
     send_code(email_verif_obj, request)

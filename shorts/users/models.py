@@ -8,7 +8,7 @@ logger = logging.getLogger('users')
 class User(AbstractUser):
     first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=150)
-    email = models.EmailField()
+    email = models.EmailField(unique=True)
     pfp = models.ImageField(upload_to='pfps/', null=True, blank=True)
 
     def save(self, *args, **kwargs):

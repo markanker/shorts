@@ -11,7 +11,7 @@ from .serializers import UserSerializer, RegistrationSerializer
 
 from email_validation.utils import verify_email
 
-from permissions import IsValidEmail
+from email_validation.permissions import IsValidEmail
 
 import logging
 logger = logging.getLogger('users')
