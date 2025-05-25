@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'links',
     'users',
     'analytics',
+    'email_validation',
 ]
 
 MIDDLEWARE = [

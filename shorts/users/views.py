@@ -9,11 +9,16 @@ from links.models import Link
 from users.models import User
 from .serializers import UserSerializer, RegistrationSerializer
 
+from email_validation.utils import verify_email
+
+from permissions import IsValidEmail
+
 import logging
 logger = logging.getLogger('users')
 
 
 class LoginView(views.APIView):
+    permission_classes = (IsValidEmail,)
     serializer_class = UserSerializer
 
     def post(self, request):
@@ -58,6 +63,9 @@ class RegistrationView(views.APIView):
         if serializer.is_valid():
             try:
                 user = serializer.save()
+
+                verify_email(user=user, request=request)
+
                 response_serializer = self.serializer_class(instance=user)
                 return Response(response_serializer.data, status=status.HTTP_201_CREATED)
             except IntegrityError:
