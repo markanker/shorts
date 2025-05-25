@@ -22,7 +22,6 @@ RANDOM_LINK_CHARS = ascii_letters + digits + '-_'
 
 class LinksGetSourceView(GenericAPIView):
     lookup_field = 'short_link'
-    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         return Link.objects.all()
