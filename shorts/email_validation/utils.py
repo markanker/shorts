@@ -7,6 +7,8 @@ from utils import get_hash_ip_address
 from string import ascii_letters, digits
 from django.conf import settings
 
+from exceptions import EmailVerificationError
+
 CODE_CHARACTERS = ascii_letters + digits
 
 
@@ -42,3 +44,15 @@ def verify_email(user, request):
         hash_ip_address=get_hash_ip_address(request),
     )
     send_code(email_verif_obj, request=request)
+
+
+def send_again(request):
+    try:
+        email_verif_obj = EmailVerificationModel.objects.get(
+            is_verified=False,
+            hash_ip_address=get_hash_ip_address(request),
+        )
+    except EmailVerificationModel.DoesNotExist:
+        raise EmailVerificationError("You cannot send code again")
+
+    send_code(email_verif_obj, request)

@@ -25,7 +25,7 @@ urlpatterns = [
     path('api/', include('users.urls')),
     path('api/', include('analytics.urls')),
     path('', include('links.urls')),
-    path('api/', include('email_validation.urls'))
+    path('api/verify_email/', include('email_validation.urls'))
 ]
 
 if settings.DEBUG:
