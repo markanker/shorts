@@ -36,16 +36,12 @@ class LinksGetSourceView(GenericAPIView):
 
 class LinksListAddView(ListCreateAPIView):
     serializer_class = serializers.LinkSerializer
-    """
-    YO GOT NOT TO BE ABLE TO SET USER OR SESSION BY YOURSELF BUT THE CONTROLLER HAS
-    """
 
     def post(self, request, *args, **kwargs):
         try:
             data = get_valid_data_from_post_request(request)
         except ValidationError as ve:
-            return Response({'message': 'you provided incorrect data in your request'},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': str(ve)}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             serializer = self.get_serializer(data=data)

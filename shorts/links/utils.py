@@ -1,6 +1,7 @@
 from random import choices, randint
 from string import ascii_letters, digits
 from exceptions import ValidationError
+from links.models import Link
 import re
 
 RANDOM_LINK_CHARS = ascii_letters + digits + '-_'
@@ -23,6 +24,16 @@ def get_valid_data_from_post_request(request):
         data['short_link'] = validate_short(data['short_link'])
     if request.user.is_authenticated:
         data['user'] = request.user.id
-    else:
+    elif request.session.session_key:
         data['session_key'] = request.session.session_key
+    else:
+        raise ValidationError('you must either have set the session_key or be authorized')
     return data
+
+
+def switch_session_to_user(user, session_key):
+    if session_key:
+        link_not_auth = Link.objects.filter(session_key=session_key)
+        link_not_auth.user = user
+        link_not_auth.session_key = None
+        link_not_auth.save()

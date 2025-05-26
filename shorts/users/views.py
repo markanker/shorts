@@ -5,12 +5,11 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 
-from links.models import Link
+from links.utils import switch_session_to_user
 from users.models import User
 from .serializers import UserSerializer, RegistrationSerializer
 
 from email_validation.utils import verify_email
-
 from email_validation.permissions import IsValidEmail
 
 import logging
@@ -26,16 +25,13 @@ class LoginView(views.APIView):
         username = request.data.get('username')
         password = request.data.get('password')
         user = auth.authenticate(username=username, password=password)
+
         if user:
             token, created = Token.objects.get_or_create(user=user)
-            if session_key:
-                link_not_auth = Link.objects.filter(session_key=session_key)
-                link_not_auth.user = user
-                link_not_auth.session_key = None
-                link_not_auth.save()
+            switch_session_to_user(user, session_key)
             return Response({'token': token.key}, status=status.HTTP_200_OK)
-        else:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 class LogoutView(views.APIView):
