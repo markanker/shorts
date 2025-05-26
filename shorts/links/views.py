@@ -1,5 +1,4 @@
 from rest_framework.generics import GenericAPIView, ListCreateAPIView
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.mixins import DestroyModelMixin
 from rest_framework.response import Response
 from rest_framework import status
@@ -11,13 +10,11 @@ from django.shortcuts import redirect
 from . import serializers
 from .models import Link
 
-from random import choices, randint
-from string import ascii_letters, digits
+from .utils import get_valid_data_from_post_request
+from exceptions import ValidationError
 
 import logging
 logger = logging.getLogger('links')
-
-RANDOM_LINK_CHARS = ascii_letters + digits + '-_'
 
 
 class LinksGetSourceView(GenericAPIView):
@@ -44,23 +41,25 @@ class LinksListAddView(ListCreateAPIView):
     """
 
     def post(self, request, *args, **kwargs):
-        data = request.data.copy()
-        if not (request.user.is_authenticated and data.get('short_link')):
-            data['short_link'] = ''.join(choices(RANDOM_LINK_CHARS, k=randint(5, 15)))
-        if request.user.is_authenticated:
-            data['user'] = request.user.id
-        else:
-            data['session_key'] = 'I dont know for now'
+        try:
+            data = get_valid_data_from_post_request(request)
+        except ValidationError as ve:
+            return Response({'message': 'you provided incorrect data in your request'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
         try:
             serializer = self.get_serializer(data=data)
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         except IntegrityError as ie:
             logger.exception(str(ie))
             return Response({'message': 'this short name for a link is already taken, try again with another one'},
                             status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        except ValidationError as ve:
+            logger.exception(str(ve))
+            return Response({'message': str(ve)}, status=status.HTTP_418_IM_A_TEAPOT)
 
     def get_queryset(self):
         return Link.objects.filter(user=self.request.user.id)

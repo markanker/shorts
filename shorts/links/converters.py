@@ -1,5 +1,8 @@
+from .utils import SHORT_REGULAR_EXPR
+
+
 class ShortLinkConverter:
-    regex = r'[A-Za-z\d\-_]{1,15}'
+    regex = SHORT_REGULAR_EXPR
 
     def to_python(self, value):
         return str(value)

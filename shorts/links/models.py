@@ -1,4 +1,5 @@
 from django.contrib.postgres.indexes import HashIndex
+from exceptions import ValidationError
 from django.db import models
 from users.models import User
 
@@ -13,6 +14,15 @@ class Link(models.Model):
         indexes = [
             HashIndex(fields=['short_link'], name='hash_index_short_link')
         ]
+
+    def save(self, *args, **kwargs):
+        if not self.user:
+            if len(self.__class__.objects.filter(short_link=self.short_link)) != 0:
+                raise ValidationError("if you want to create more links, register then")
+        else:
+            if len(self.__class__.objects.filter(short_link=self.short_link)) >= 10:
+                raise ValidationError("you cannot create more than 10 links per account")
+        return super().save(*args, **kwargs)
 
     def __str__(self):
         return self.short_link
