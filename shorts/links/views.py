@@ -5,13 +5,13 @@ from rest_framework import status
 
 from django.urls import NoReverseMatch
 from django.db.utils import IntegrityError
-
 from django.shortcuts import redirect
+
 from . import serializers
 from .models import Link
-
 from .utils import get_valid_data_from_post_request
 from exceptions import ValidationError
+from analytics.utils import analytics_mark_in
 
 import logging
 logger = logging.getLogger('links')
@@ -25,7 +25,9 @@ class LinksGetSourceView(GenericAPIView):
 
     def get(self, request, short_link):
         instance = self.get_object()
-        # follower? analytics? statistics? is_owner?
+
+        analytics_mark_in(request, instance)
+
         try:
             response = redirect(instance.source_link)
         except NoReverseMatch:
