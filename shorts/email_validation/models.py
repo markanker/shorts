@@ -1,6 +1,6 @@
 from django.db import models
 from users.models import User
-import datetime
+from datetime import datetime, timezone, timedelta
 
 
 class EmailVerificationModel(models.Model):
@@ -13,7 +13,7 @@ class EmailVerificationModel(models.Model):
     sent_mail_to_user_counter = models.PositiveSmallIntegerField(default=0)
 
     def is_expired(self):
-        if datetime.datetime.now() - self.time_update >= datetime.timedelta(minutes=15):
+        if datetime.now(timezone.utc) - self.time_updated >= timedelta(minutes=15):
             return self.verification_test_failed()
         return False
 

@@ -14,17 +14,22 @@ def verify_email_view(request, verif_code):
     hash_ip_address = get_hash_ip_address(request)
 
     try:
-        user_to_verify = EmailVerificationModel.objects.get(hash_ip_address=hash_ip_address, is_verified=False)
+        user_to_verify = EmailVerificationModel.objects.get(
+            code=verif_code,
+            hash_ip_address=hash_ip_address,
+            is_verified=False,
+        )
     except EmailVerificationModel.DoesNotExist:
-        return Response({}, status.HTTP_400_BAD_REQUEST)
+        return Response({'message': 'there is no such code you provided'}, status.HTTP_400_BAD_REQUEST)
 
     if user_to_verify.is_expired():
-        return Response({}, status.HTTP_408_REQUEST_TIMEOUT)
+        return Response({'message': 'your verification code is expired, so we are '
+                                    'supposed to delete your account'}, status.HTTP_408_REQUEST_TIMEOUT)
 
     if user_to_verify.code == verif_code:
         user_to_verify.is_verified = True
         user_to_verify.save()
-        return Response({}, status=status.HTTP_200_OK)
+        return Response({'message': 'your email was successfully verified'}, status=status.HTTP_200_OK)
 
     return Response({'message': 'the provided code is incorrect'}, status.HTTP_400_BAD_REQUEST)
 
@@ -37,4 +42,4 @@ class SendAgainView(APIView):
             send_again(request)
         except EmailVerificationError as eve:
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
-        return Response({}, status=status.HTTP_200_OK)
+        return Response({'message': 'the code was sent again on your email'}, status=status.HTTP_200_OK)
