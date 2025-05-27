@@ -10,6 +10,7 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=150)
     email = models.EmailField(unique=True)
     pfp = models.ImageField(upload_to='pfps/', null=True, blank=True)
+    is_subscriber = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         if self.pk:

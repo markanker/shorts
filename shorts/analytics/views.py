@@ -21,13 +21,13 @@ class LinksAnalyticsViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
 
     def list(self, request, *args, **kwargs):
         try:
-            super().list(request, *args, **kwargs)
+            return super().list(request, *args, **kwargs)
         except ValidationError:
             return Response({'error': 'something'}, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, *args, **kwargs):
         try:
-            super().retrieve(request, *args, **kwargs)
+            return super().retrieve(request, *args, **kwargs)
         except ValidationError:
             return Response({'error': 'something'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -57,5 +57,6 @@ class LinksAnalyticsViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
         except ValidationError as ve:
             logger.exception(str(ve))
             raise ValidationError(str(ve))
-        else:
-            return LinkStats.objects.select_related('link').filter(**validator.filter_kwargs)
+
+        return (LinkStats.objects.select_related('link')
+                .filter(**validator.filter_kwargs).prefetch_related('follower'))

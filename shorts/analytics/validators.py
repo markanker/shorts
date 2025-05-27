@@ -77,7 +77,7 @@ class FilterValidator:
                     self.__followers = followers
             case int():
                 raise ValidationError(f"The follower's id must be a positive number, "
-                                      f"not ({followers})")
+                                      f"not {followers}")
             case _:
                 raise ValidationError(f"Followers parameter must be either 'all' "
                                       f"or a positive integer number")
