@@ -26,7 +26,8 @@ class LinksGetSourceView(GenericAPIView):
     def get(self, request, short_link):
         instance = self.get_object()
 
-        analytics_mark_in(request, instance)
+        if request.user.is_authenticated:
+            analytics_mark_in(request, instance)
 
         try:
             response = redirect(instance.source_link)
