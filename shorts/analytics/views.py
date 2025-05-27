@@ -58,5 +58,4 @@ class LinksAnalyticsViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
             logger.exception(str(ve))
             raise ValidationError(str(ve))
 
-        return (LinkStats.objects.select_related('link')
-                .filter(**validator.filter_kwargs).prefetch_related('follower'))
+        return LinkStats.objects.select_related('link', 'follower').filter(**validator.filter_kwargs)
