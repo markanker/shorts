@@ -3,11 +3,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import LinkStatsSerializer
+from .serializers import LinkStatsSerializer, FollowerForSubscriberSerializer
+from .permissions import IsSubscriber
 from .models import Follower, LinkStats
 from exceptions import ValidationError
-from links.models import Link
-from users.models import User
 from .validators import FilterValidator
 
 import logging
@@ -59,3 +58,17 @@ class LinksAnalyticsViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
             raise ValidationError(str(ve))
 
         return LinkStats.objects.select_related('link', 'follower').filter(**validator.filter_kwargs)
+
+
+class FollowerViewSet(RetrieveModelMixin, GenericViewSet):
+    permission_classes = (IsAuthenticated, IsSubscriber)
+    serializer_class = FollowerForSubscriberSerializer
+
+    def get_queryset(self):
+        return Follower.objects.all()
+
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            return super().retrieve(request, *args, **kwargs)
+        except ValidationError:
+            return Response({'error': 'something'}, status=status.HTTP_400_BAD_REQUEST)

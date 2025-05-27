@@ -31,11 +31,9 @@ class LinksGetSourceView(GenericAPIView):
             analytics_mark_in(request, instance)
 
         try:
-            response = redirect(instance.source_link)
+            return redirect(instance.source_link)
         except NoReverseMatch:
-            response = Response({'source_link': instance.source_link},
-                                status=status.HTTP_200_OK)
-        return response
+            return Response({'source_link': instance.source_link}, status=status.HTTP_200_OK)
 
 
 class LinksListAddView(ListCreateAPIView):
