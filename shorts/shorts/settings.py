@@ -25,6 +25,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
+# for May 27, 2025, the pattern is: https://api.2ip.io/{ip_address}?token={token}
+__API_KEY = os.getenv('API_KEY')
+DATA_BY_IP_SERVICE = {
+    'api_key': __API_KEY,
+    'url_root_pattern': 'https://api.2ip.io/',
+}
+
+# May 27, 2025, the pattern: https://whatmyuseragent.com/api?ua={user-agent}&key=NOTREQUIED
+# !!!requiED!!!
+DATA_FROM_USER_AGENT_SERVICE = {
+    'url_root_pattern': 'https://whatmyuseragent.com/api',
+}
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(int(os.getenv('DEBUG')))
 

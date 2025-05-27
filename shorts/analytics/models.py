@@ -14,4 +14,6 @@ class LinkStats(models.Model):
     is_owner = models.BooleanField(default=False)
     created_at = models.TimeField(auto_now_add=True)
     device = models.TextField(max_length=6, default='pc')
-    browser_name = models.TextField(max_length=30)
+    browser_name = models.TextField(max_length=20)
+    os_name = models.TextField(max_length=20, null=True, blank=True)
+    os_version = models.TextField(max_length=10, null=True, blank=True)
