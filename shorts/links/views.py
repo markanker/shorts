@@ -3,6 +3,7 @@ from rest_framework.mixins import DestroyModelMixin
 from rest_framework.response import Response
 from rest_framework import status
 
+from rest_framework.permissions import IsAuthenticated
 from django.urls import NoReverseMatch
 from django.db.utils import IntegrityError
 from django.shortcuts import redirect
@@ -39,6 +40,7 @@ class LinksGetSourceView(GenericAPIView):
 
 class LinksListAddView(ListCreateAPIView):
     serializer_class = serializers.LinkSerializer
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
         try:
@@ -67,6 +69,7 @@ class LinksListAddView(ListCreateAPIView):
 class LinksDeleteUpdate(DestroyModelMixin, GenericAPIView):
     serializer_class = serializers.LinkSerializer
     lookup_field = 'short_link'
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         return Link.objects.filter(user=self.request.user)

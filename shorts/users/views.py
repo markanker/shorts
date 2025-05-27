@@ -5,7 +5,6 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 
-from links.utils import switch_session_to_user
 from users.models import User
 from .serializers import UserSerializer, RegistrationSerializer
 
@@ -28,7 +27,6 @@ class LoginView(views.APIView):
 
         if user:
             token, created = Token.objects.get_or_create(user=user)
-            switch_session_to_user(user, session_key)
             return Response({'token': token.key}, status=status.HTTP_200_OK)
 
         return Response(status=status.HTTP_401_UNAUTHORIZED)
