@@ -26,9 +26,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # for May 27, 2025, the pattern is: https://api.2ip.io/{ip_address}?token={token}
-__API_KEY = os.getenv('API_KEY')
 DATA_BY_IP_SERVICE = {
-    'api_key': __API_KEY,
+    'api_key': os.getenv('API_KEY'),
     'url_root_pattern': 'https://api.2ip.io/',
 }
 
@@ -179,6 +178,21 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+if DEBUG:
+    CACHE_BACKEND = 'django.core.cache.backends.dummy.DummyCache'
+    LOCATION = None
+else:
+    CACHE_BACKEND = 'django.core.cache.backends.redis.RedisCache'
+    # e.g. redis://redis_cache:6379 if the redis service is named redis_cache in compose
+    LOCATION = 'redis://redis_cache:6379'
+
+CACHES = {
+    'default': {
+        'BACKEND': CACHE_BACKEND,
+        'LOCATION': LOCATION,
+    }
+}
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -211,6 +225,12 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': 'logs/analytics.log',
         },
+    'email_validation_handler': {
+            'level': FILE_LOG_LEVEL,
+            'formatter': 'default',
+            'class': 'logging.FileHandler',
+            'filename': 'logs/email_validation.log',
+        },
     },
     'loggers': {
         'links': {
@@ -223,6 +243,10 @@ LOGGING = {
         },
         'analytics': {
             'handlers': ['standard_out', 'analytics_handler'],
+            'propagate': False,
+        },
+        'email_validation': {
+            'handlers': ['standard_out', 'email_validation_handler'],
             'propagate': False,
         },
     },

@@ -8,6 +8,9 @@ from .utils import send_again
 from exceptions import EmailVerificationError
 from .permissions import IsAbleToSendAgain
 
+import logging
+logger = logging.getLogger('email_validation')
+
 
 @api_view(['GET'])
 def verify_email_view(request, verif_code):
