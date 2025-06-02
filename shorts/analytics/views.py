@@ -43,6 +43,7 @@ class LinksAnalyticsViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
 
         try:
             validator = FilterValidator(
+                user=self.request.user.pk,
                 owner=owner,
                 device=device,
                 time=time,

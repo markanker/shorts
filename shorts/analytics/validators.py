@@ -84,6 +84,7 @@ class FilterValidator:
 
     def __get_db_filter_kwargs(self):
         return {
+            'user': self.__user,
             'is_owner': self.__owner,
             'device': self.__device,
             'created_timestamp__date': self.__time,
@@ -94,8 +95,9 @@ class FilterValidator:
             'browser_name': self.__browser,
         }
 
-    def __init__(self, owner=None, device='pc', time=None, from_time=None, to_time=None,
-                 followers='all', browser=None, country=None, city=None):
+    def __init__(self, user, owner=None, device='pc', time=None, from_time=None,
+                 to_time=None, followers='all', browser=None, country=None, city=None):
+        self.__user = user
         self.__validate_and_set_owner(owner)
         self.__validate_and_set_device(device)
         self.__validate_and_set_time(time, from_time, to_time)
