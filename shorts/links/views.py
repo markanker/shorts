@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.urls import NoReverseMatch
 from django.db.utils import IntegrityError
 from django.shortcuts import redirect
+from django.core.cache import cache
 
 from . import serializers
 from .models import Link
@@ -25,7 +26,11 @@ class LinksGetSourceView(GenericAPIView):
         return Link.objects.all()
 
     def get(self, request, short_link):
-        instance = self.get_object()
+        cache_key = short_link
+        instance = cache.get(cache_key)
+        if not instance:
+            instance = self.get_object()
+            cache.set(cache_key, instance, 60*60*24)
 
         if request.user.is_authenticated:
             analytics_mark_in(request, instance)
