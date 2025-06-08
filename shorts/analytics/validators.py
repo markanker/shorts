@@ -1,6 +1,7 @@
 from exceptions import ValidationError
 import re
-from datetime import date as dt, datetime as dttm
+from datetime import datetime as dttm
+from django.utils import timezone
 from .models import Follower
 
 
@@ -38,10 +39,10 @@ class FilterValidator:
         except ValueError:
             raise ValidationError("Wrong date format. The right one is: YYYY-MM-DD")
         try:
-            valid_date = dt(year=y, month=m, day=d)
+            valid_date = dttm(year=y, month=m, day=d)
         except ValueError as ve:
             raise ValidationError(str(ve))
-        return valid_date
+        return timezone.make_aware(valid_date)
 
     def __validate_and_set_time(self, time, from_time, to_time):
         if not ((time and not (from_time or to_time)) or (not time and from_time)):
@@ -55,7 +56,7 @@ class FilterValidator:
             time = self.__get_valid_date_or_raise(time)
         else:
             from_time = self.__get_valid_date_or_raise(from_time)
-            to_time = self.__get_valid_date_or_raise(to_time) if to_time else dttm.now()
+            to_time = self.__get_valid_date_or_raise(to_time) if to_time else timezone.now()
             if to_time < from_time:
                 raise ValidationError(f"to_time ({to_time}) parameter cannot be earlier "
                                       f"than from_time ({from_time})")
@@ -83,21 +84,24 @@ class FilterValidator:
                                       f"or a positive integer number")
 
     def __get_db_filter_kwargs(self):
-        return {
-            'user': self.__user,
+        res = {
+            'user_id': self.__user_id,
+            'link__short_link': self.__short_link,
             'is_owner': self.__owner,
             'device': self.__device,
-            'created_timestamp__date': self.__time,
-            'created_timestamp__date__range': (self.__from_time, self.__to_time),
+            'created_at__date': self.__time,
+            'created_at__range': (self.__from_time, self.__to_time) if not self.__time else None,
             'follower__id': self.__followers,
             'follower__country': self.__country,
             'follower__city': self.__city,
             'browser_name': self.__browser,
         }
+        return {k: v for k, v in res.items() if v}
 
-    def __init__(self, user, owner=None, device='pc', time=None, from_time=None,
+    def __init__(self, user_id, short_link=None, owner=None, device='pc', time=None, from_time=None,
                  to_time=None, followers='all', browser=None, country=None, city=None):
-        self.__user = user
+        self.__user_id = user_id
+        self.__short_link = short_link
         self.__validate_and_set_owner(owner)
         self.__validate_and_set_device(device)
         self.__validate_and_set_time(time, from_time, to_time)

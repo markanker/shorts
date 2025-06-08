@@ -1,5 +1,6 @@
 from .models import LinkStats, Follower
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
+from django.utils import timezone
 from utils import just_get_ip
 import requests
 
@@ -35,7 +36,7 @@ def analytics_mark_in(request, link):
     if len((last_visit := LinkStats.objects.filter(
         link=link, follower=follower, is_owner=is_owner
     ))) > 0:
-        if datetime.now(timezone.utc) - last_visit.last().created_at < timedelta(minutes=5):
+        if timezone.now() - last_visit.last().created_at < timedelta(minutes=5):
             return None
 
     user_agent = request.META['HTTP_USER_AGENT']
@@ -52,6 +53,7 @@ def analytics_mark_in(request, link):
     LinkStats.objects.create(
         link=link,
         follower=follower,
+        user_id=request.user.pk,
         is_owner=is_owner,
         device=device,
         browser_name=browser_name,

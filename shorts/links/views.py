@@ -77,7 +77,7 @@ class LinksDeleteUpdate(DestroyModelMixin, GenericAPIView):
     def get_queryset(self):
         return Link.objects.filter(user=self.request.user)
 
-    def patch(self, request):
+    def patch(self, request, *args, **kwargs):
         instance = self.get_object()
 
         if not (len(request.data) >= 1 and "short_link" in request.data):

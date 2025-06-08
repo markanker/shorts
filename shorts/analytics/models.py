@@ -11,8 +11,9 @@ class Follower(models.Model):
 class LinkStats(models.Model):
     link = models.ForeignKey(to=Link, on_delete=models.CASCADE, related_name='stats')
     follower = models.ForeignKey(to=Follower, on_delete=models.CASCADE, related_name='stats', null=True, blank=True)
+    user_id = models.PositiveIntegerField()
     is_owner = models.BooleanField(default=False)
-    created_at = models.TimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     device = models.TextField(max_length=6, default='pc')
     browser_name = models.TextField(max_length=20)
     os_name = models.TextField(max_length=20, null=True, blank=True)

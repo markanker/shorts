@@ -13,24 +13,19 @@ import logging
 logger = logging.getLogger('analytics')
 
 
-class LinksAnalyticsViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
+class LinksAnalyticsViewSet(ListModelMixin, GenericViewSet):
     permission_classes = (IsAuthenticated,)
     serializer_class = LinkStatsSerializer
-    lookup_field = 'short_link'
 
     def list(self, request, *args, **kwargs):
         try:
             return super().list(request, *args, **kwargs)
-        except ValidationError:
-            return Response({'error': 'something'}, status=status.HTTP_400_BAD_REQUEST)
-
-    def retrieve(self, request, *args, **kwargs):
-        try:
-            return super().retrieve(request, *args, **kwargs)
-        except ValidationError:
-            return Response({'error': 'something'}, status=status.HTTP_400_BAD_REQUEST)
+        except ValidationError as ve:
+            return Response({'error': str(ve)}, status=status.HTTP_400_BAD_REQUEST)
 
     def get_queryset(self):
+        user_id = self.request.user.pk
+        short_link = self.request.GET.get('short_link')
         owner = self.request.GET.get('owner')
         device = self.request.GET.get('device', 'pc')
         country = self.request.GET.get('country')
@@ -43,7 +38,8 @@ class LinksAnalyticsViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
 
         try:
             validator = FilterValidator(
-                user=self.request.user.pk,
+                user_id=user_id,
+                short_link=short_link,
                 owner=owner,
                 device=device,
                 time=time,
