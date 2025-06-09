@@ -44,5 +44,5 @@ class SendAgainView(APIView):
         try:
             send_again(request)
         except EmailVerificationError as eve:
-            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': str(eve)}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'message': 'the code was sent again on your email'}, status=status.HTTP_200_OK)

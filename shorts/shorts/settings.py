@@ -72,6 +72,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'rest_framework.authtoken',
+    'drf_spectacular',
 
     'links',
     'users',
@@ -130,6 +131,16 @@ DATABASES = {
     }
 }
 
+if not DEBUG:
+    CORS_ALLOWED_ORIGINS = [
+        'http://127.0.0.1',
+        'http://localhost',
+        'https://127.0.0.1',
+        'https://localhost',
+    ]
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDER_PROTO', 'https')
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -155,8 +166,15 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
+    'DEFAULT_SCHEMA_CLASS': "drf_spectacular.openapi.AutoSchema",
 }
 
+SPECTACULAR_SETTINGS = {
+    'TITLE': "Shorts' API",
+    'DESCRIPTION': 'An API of URL shortener service',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
