@@ -1,0 +1,54 @@
+services:
+  backend:
+    build:
+      target: builder
+    image: shorts:0.1
+    container_name: shorts_backend
+    depends_on:
+      - db
+      - redis_cache
+    environment:
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+      DEBUG: ${DEBUG}
+      DB_NAME: ${DB_NAME}
+      DB_ENGINE: ${DB_ENGINE}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD}
+      EMAIL_USE_SSL: ${EMAIL_USE_SSL}
+      EMAIL_HOST: ${EMAIL_HOST}
+      EMAIL_PORT: ${EMAIL_PORT}
+      EMAIL_HOST_USER: ${EMAIL_HOST_USER}
+      API_KEY: ${API_KEY}
+    volumes:
+      - "media:/shorts/media"
+  db:
+    image: postgres:17.4
+    container_name: shorts_db
+    volumes:
+      - "db_data:/var/lib/postgresql/data"
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+  redis_cache:
+    image: redis
+    container_name: shorts_cache
+  proxy:
+    build:
+      target: proxy
+    image: shorts_proxy:0.2
+    container_name: shorts_proxy
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"
+
+volumes:
+  db_data:
+  media:
