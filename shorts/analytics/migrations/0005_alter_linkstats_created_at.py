@@ -10,9 +10,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name='linkstats',
-            name='created_at',
-            field=models.DateTimeField(auto_now_add=True),
-        ),
+        # migrations.AlterField(
+        #     model_name='linkstats',
+        #     name='created_at',
+        #     field=models.DateTimeField(auto_now_add=True),
+        # ),
     ]

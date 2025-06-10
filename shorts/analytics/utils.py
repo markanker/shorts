@@ -36,7 +36,7 @@ def analytics_mark_in(request, link):
     if len((last_visit := LinkStats.objects.filter(
         link=link, follower=follower, is_owner=is_owner
     ))) > 0:
-        if timezone.now() - last_visit.last().created_at < timedelta(minutes=5):
+        if timezone.now() - last_visit.last().created_date < timedelta(minutes=5):
             return None
 
     user_agent = request.META['HTTP_USER_AGENT']
