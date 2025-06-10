@@ -47,7 +47,7 @@ else:
     CONSOLE_LOG_LEVEL = "WARNING"
     FILE_LOG_LEVEL = "INFO"
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')

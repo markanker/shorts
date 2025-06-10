@@ -30,5 +30,6 @@ local_settings.py
 *.sqlite3
 *.db
 media/
+static/
 fixtures/
 logs/
