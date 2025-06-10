@@ -38,7 +38,7 @@ DATA_FROM_USER_AGENT_SERVICE = {
 }
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(int(os.getenv('DEBUG')))
+DEBUG = bool(int(os.getenv('DEBUG', '0')))
 
 if DEBUG:
     CONSOLE_LOG_LEVEL = "DEBUG"
